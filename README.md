@@ -8,13 +8,8 @@ usage
 
 install package
 
-<<<<<<< HEAD
 Write your console commands.
 For example in myproject/console.py:
-=======
-write your console commands.
-for example in myproject.console.py:
->>>>>>> 9cb888afb9c73609509c6e0c9c8f5fe1693d2f7c
 
     class MyCmd(Command):
 
@@ -37,7 +32,6 @@ For example in development.ini:
         use = egg:myproject
         ...
         ...
-
         console_commands = myproject.console
 
 
