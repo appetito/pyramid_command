@@ -66,6 +66,7 @@ class CommandRunner(object):
 
     def run(self, command):
         if command not in self.commands:
+            print "No command found: ", command
             print "available commands: "
             for name, cmd in self.commands.items():
                 print '\t* ', '%s: %s' %(name, cmd.description)
