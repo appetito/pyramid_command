@@ -11,6 +11,8 @@ install package
 Write your console commands.
 For example in myproject/console.py:
 
+    from pyramid_command import Command
+    
     class MyCmd(Command):
 
         name = "my_cmd"
