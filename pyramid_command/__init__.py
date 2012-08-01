@@ -13,6 +13,25 @@ from pyramid.decorator import reify
 from pyramid.path import DottedNameResolver
 
 
+def _valid_command(obj):
+    return inspect.isclass(obj) and issubclass(obj, Command) and obj != Command
+
+
+class Command(object):
+    """base class for console commands"""
+
+    args = tuple()
+    description = "no description"
+    name = None
+
+    def __init__(self, runner):
+        self.runner = runner 
+        self.app = runner.bootstrap() # bootstrap application
+
+    def run(self):
+        raise NotImplementedError("'run' method of command not implemented")
+
+
 class CommandRunner(object):
     """
     console application
@@ -28,12 +47,12 @@ class CommandRunner(object):
         self.commands = {}
         for entry in cmd_entries:
             if inspect.ismodule(entry):
-                for m in inspect.getmembers(entry, lambda c: inspect.isclass(c) and issubclass(c, Command) and c!=Command):
+                for m in inspect.getmembers(entry, _valid_command):
                     self._register_command(m[1])
-            elif inspect.isclass(entry) and issubclass(entry, Command) and entry!=Command:
+            elif _valid_command(entry):
                 self._register_command(entry)
             else:
-                raise TypeError("command must be a module or a subclass of 'pyramid_command.Command' class")
+                raise TypeError("Command must be a module or a subclass of 'pyramid_command.Command' class")
 
     def _register_command(self, cmd):
         if not cmd.name:
@@ -64,33 +83,6 @@ class CommandRunner(object):
                 names = (a[0],)
             parser.add_argument(*names, **a[1])
         return parser.parse_args(sys.argv[3:])
-
-
-class Command(object):
-    """base class for console commands"""
-
-    args = tuple()
-    description = "no description"
-    name = None
-
-    def __init__(self, runner):
-        self.runner = runner # bootstrap application
-        self.app = runner.bootstrap()
-
-    def run(self):
-        raise NotImplementedError("'run' method of command not implemented")
-
-
-
-class Migrate(Command):
-    name = u'migrate'
-    description = u'Migrate database schema'
-
-    args = (
-            (('--silent', '-s'), {'help': 'no output', 'dest':'silent', 'action': 'store_true'}),
-            ('--script', {'help': 'execute SQL script', 'dest':'script'}),
-        )
-
 
 
 def main():
