@@ -14,6 +14,7 @@ setup(name='pyramid_command',
       classifiers=[
         "Programming Language :: Python",
         "Framework :: Pyramid",
+        "Development Status :: 4 - Beta",
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
         ],
