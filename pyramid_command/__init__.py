@@ -4,6 +4,7 @@ import sys
 import os
 import argparse
 import datetime
+import inspect
 
 import pyramid.paster
 from pyramid.paster import bootstrap
@@ -21,12 +22,25 @@ class CommandRunner(object):
         self.ini_file = ini_file
         self.settings = get_appsettings(ini_file)
         pyramid.paster.setup_logging(ini_file)
-        cmd_list = self.settings.get('console_commands', '').split('\n')
+        cmd_paths = self.settings.get('console_commands', '').split('\n')
         r = DottedNameResolver()
+        cmd_entries = [r.resolve(p.strip()) for p in cmd_paths] 
         self.commands = {}
-        for cmd in cmd_list:
-            cmd_class = r.resolve(cmd)
-            self.commands[cmd_class.name] = cmd_class
+        for entry in cmd_entries:
+            if inspect.ismodule(entry):
+                for m in inspect.getmembers(entry, lambda c: inspect.isclass(c) and issubclass(c, Command) and c!=Command):
+                    self._register_command(m[1])
+            elif inspect.isclass(entry) and issubclass(entry, Command) and entry!=Command:
+                self._register_command(entry)
+            else:
+                raise TypeError("command must be a module or a subclass of 'pyramid_command.Command' class")
+
+    def _register_command(self, cmd):
+        if not cmd.name:
+            cmd.name = cmd.__name__.lower()
+        if cmd.name in self.commands:
+            raise TypeError("Command name conflict '%s': %s, %s" % (cmd.name, self.commands[cmd.name], cmd))
+        self.commands[cmd.name] = cmd
 
     def bootstrap(self):
         return bootstrap(self.ini_file)
@@ -56,6 +70,8 @@ class Command(object):
     """base class for console commands"""
 
     args = tuple()
+    description = "no description"
+    name = None
 
     def __init__(self, runner):
         self.runner = runner # bootstrap application

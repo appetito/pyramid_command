@@ -1,2 +1,4 @@
-pyramyd_cli
+pyramyd_command
 ===========
+
+Console commands manager for Pyramid framework
