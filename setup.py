@@ -23,6 +23,7 @@ setup(name='pyramid_command',
       url='',
       keywords='web pyramid console',
       packages=['pyramid_command'],
+      include_package_data=True,
       zip_safe=False,
       entry_points = """\
       [paste.app_factory]
