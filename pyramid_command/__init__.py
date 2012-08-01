@@ -75,7 +75,7 @@ class CommandRunner(object):
         cmd(self).run(**vars(args))
 
     def parse_args(self, command):
-        parser = argparse.ArgumentParser(command.description)
+        parser = argparse.ArgumentParser(command.name)
         for a in command.args:
             if isinstance(a[0], (list, tuple)):
                 names = a[0]
