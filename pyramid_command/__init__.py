@@ -34,17 +34,20 @@ class Command(object):
 
 class CommandRunner(object):
     """
-    console application
+    console command runner
     """
 
     def __init__(self, ini_file):
         self.ini_file = ini_file
         self.settings = get_appsettings(ini_file)
         pyramid.paster.setup_logging(ini_file)
-        cmd_paths = self.settings.get('console_commands', '').split('\n')
-        r = DottedNameResolver()
-        cmd_entries = [r.resolve(p.strip()) for p in cmd_paths] 
         self.commands = {}
+        cmd_paths = self.settings.get('console_commands', '')
+        if not cmd_paths:
+            print "No commands defined in your ini-file."
+        cmd_paths = cmd_paths.split('\n')
+        r = DottedNameResolver()
+        cmd_entries = [r.resolve(p.strip()) for p in cmd_paths if p.strip()] 
         for entry in cmd_entries:
             if inspect.ismodule(entry):
                 for m in inspect.getmembers(entry, _valid_command):

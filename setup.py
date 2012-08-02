@@ -1,4 +1,4 @@
-import os
+import os, sys
 
 from setuptools import setup
 
@@ -6,6 +6,10 @@ here = os.path.abspath(os.path.dirname(__file__))
 README = open(os.path.join(here, 'README.md')).read()
 CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
+requires = []
+
+if sys.version_info < (2, 7):
+    requires = ['argparse']
 
 setup(name='pyramid_command',
       version='0.1',
@@ -23,6 +27,7 @@ setup(name='pyramid_command',
       url='',
       keywords='web pyramid console',
       packages=['pyramid_command'],
+      install_requires=requires,
       include_package_data=True,
       zip_safe=False,
       entry_points = """\
